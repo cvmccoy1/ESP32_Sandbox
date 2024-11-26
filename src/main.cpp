@@ -12,10 +12,10 @@
   https://dronebotworkshop.com
 */
 
-// Include the Serial Peripheral Interface (SPI)
+// Include the Serial Peripheral Interface (SPI) Library
 #include <SPI.h>
 
-// Include Arduino framework
+// Include Arduino Framework Library
 #include <Arduino.h>
 
 // Include PCF8574 Library for I2C LCD
@@ -26,6 +26,10 @@
 
 // Include Adafruit PWM Library
 #include <Adafruit_PWMServoDriver.h>
+
+// Include Local Modules
+#include "main_core1.h"
+#include "utilities.h"
  
 // Define LCD I2C Address - change if required
 const int lcdI2Caddr = 0x27;
@@ -34,7 +38,7 @@ const int lcdColumns = 16;
 const int lcdRows = 2;
 
 // Define LCD object
-LiquidCrystal_PCF8574 lcd = NULL; // = lcd(i2c_addr); 
+LiquidCrystal_PCF8574 lcd(lcdI2Caddr); 
 
 // Servo mimimum and maximum angles
 #define MIN_ANGLE   0
@@ -45,12 +49,11 @@ LiquidCrystal_PCF8574 lcd = NULL; // = lcd(i2c_addr);
 #define MAX_PULSE_WIDTH       2350
 #define FREQUENCY             50
 
-
 // Define Servo Drive I2C Address - change if required
 const int servoMotorI2Caddr = 0x40;
 
 // Define PWM object
-Adafruit_PWMServoDriver servoDriver = NULL; // = Adafruit_PWMServoDriver(servoMotorI2Caddr)
+Adafruit_PWMServoDriver servoDriver(servoMotorI2Caddr);
 #define NUM_MOTORS  2
 
 // Define Potentiometer Inputs
@@ -63,18 +66,6 @@ const int motor1 = 1;
 // Define current Motor position variables
 int mtrDegree[NUM_MOTORS] = { 0, 0 };
 
-// Define the interrupt flag 
-volatile bool heartbeatFlag = LOW;
-// Define the interrupt service routine (ISR)
-volatile bool interruptFlag = false;
-
-// Timer interrupt handler function
-void IRAM_ATTR onTimer(void* arg) 
-{
-  interruptFlag = true;
-}
-
-extern void findI2CDevices();
 
 // Function to move motor to specific position
 void moveMotorDeg(int moveDegree, int motorOut)
@@ -150,16 +141,14 @@ void setup()
   // Start Serial Monitor                                                 
   Serial.begin(115200);  
 
-   // Initialize the Heartbeat LED pin as an output
+  // Initialize the Heartbeat LED pin as an output
   pinMode(LED_BUILTIN, OUTPUT);
 
   // Setup the LCD Display
-  lcd = LiquidCrystal_PCF8574(lcdI2Caddr); 
   lcd.begin(lcdColumns, lcdRows); 
   lcd.setBacklight(255);
 
   // Setup PWM Controller object
-  servoDriver = Adafruit_PWMServoDriver(servoMotorI2Caddr);
   servoDriver.begin();
   servoDriver.setPWMFreq(FREQUENCY);
 
@@ -168,40 +157,23 @@ void setup()
   // Set the initial display content
   updateDisplay();
 
-  // Create an ESP timer that triggers every 1 second (1000000 microseconds)
-  esp_timer_handle_t timer;
-  esp_timer_create_args_t timer_args = 
-  {
-    .callback = onTimer,
-    .arg = NULL,
-    .name = "one_second_timer"
-  };
-
-  // Initialize the timer
-  esp_timer_create(&timer_args, &timer);
-
-  // Start the timer to trigger every 1 second (1,000,000 microseconds)
-  esp_timer_start_periodic(timer, 1000000); // 1 second interva
+  // Start Core1
+  StartCore1();
 }
  
 void loop() 
 {
+  // Uncomment the following line of code if the LCD and/or Servo Driver don't appear to work
+  //   in order to confirm the I2C addresses defined for these devices are correct or not.
+  //   Once the correct addresses are found, make sure to re-comment the line out.
   //findI2CDevices();
 
   // Add short delay
   delay(100);
   
   // Only if the motor positions have change will the following function return true
-  if (updateMotors()) 
-    updateDisplay();
-
-  if (interruptFlag)
+  if (updateMotors())
   {
-    interruptFlag = false; // Reset the flag
-    heartbeatFlag = !heartbeatFlag;
-    // Set the Heartbeat LED
-    digitalWrite(LED_BUILTIN, heartbeatFlag);
-        // Print a message or perform any task you need
-    //Serial.printf("One second has passed!  heartbeatFlag = %s (%d)\n", heartbeatFlag ? "HIGH" : "LOW", heartbeatFlag);
+    updateDisplay();
   }
 }
