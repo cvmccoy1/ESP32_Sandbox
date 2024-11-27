@@ -1,3 +1,3 @@
 #pragma once
 
-void findI2CDevices();
+void FindI2CDevices();

@@ -1,4 +1,6 @@
+// Include Arduino Framework Library
 #include <Arduino.h>
+
 #include "heartbeat.h"
 
 // Declare a handle for the task running on Core 1
@@ -43,6 +45,5 @@ void setupCore1()
 // Loop Function for Core1 - Add Execution code for Core1 here
 void loopCore1()
 {
-  Serial.println("Running on Core 1");
-  delay(1000);
+  //Serial.println("Running on Core 1");
 }

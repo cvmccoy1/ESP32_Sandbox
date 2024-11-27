@@ -4,7 +4,7 @@
 // Include Wire Library for I2C Communications
 #include <Wire.h>
 
-void findI2CDevices() 
+void FindI2CDevices() 
 {
   byte error, address;
   int nDevices;
