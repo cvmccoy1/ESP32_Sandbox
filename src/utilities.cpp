@@ -4,6 +4,78 @@
 // Include Wire Library for I2C Communications
 #include <Wire.h>
 
+const char* enumToString(esp_chip_model_t model) {
+  switch(model)
+  {
+    case CHIP_ESP32:   return "ESP32";
+    case CHIP_ESP32S2: return "ESP32-S2";
+    case CHIP_ESP32S3:  return "ESP32-S3";
+    case CHIP_ESP32C3: return "ESP32-C3";
+    case CHIP_ESP32H2:  return "ESP32-H2";
+    default:    return "Unknown";
+  }
+}
+
+void reportChipFeatures(uint32_t features)
+{
+  Serial.printf("Features:\n");
+  if (CHIP_FEATURE_EMB_FLASH & features)
+    Serial.printf("  Embedded Flash Memory\n");
+  if (CHIP_FEATURE_WIFI_BGN & features)
+    Serial.printf("  2.4GHz WiFi\n"); 
+  if (CHIP_FEATURE_BLE & features)
+    Serial.printf("  Bluetooth LE\n");
+  if (CHIP_FEATURE_BT & features)
+    Serial.printf("  Bluetooth Classic\n");
+  if (CHIP_FEATURE_IEEE802154 & features)
+    Serial.printf("  IEEE 802.15.4 (Low power, low data-rate wireless communication)\n");             
+  if (CHIP_FEATURE_EMB_PSRAM & features)
+    Serial.printf("  Embedded PSRAM\n");    
+}
+
+void reportPSRAMsize()
+{
+    // Check if PSRAM is available
+  if (esp_spiram_is_initialized())
+  {
+    Serial.printf("PSRAM Size: %dMB\n", esp_spiram_get_size() / (1024 * 1024));
+  }
+  else
+  {
+    Serial.printf("No PSRAM available\n");
+  }
+
+}
+
+void ReportChipInfo()
+{
+  esp_chip_info_t chip_info;
+
+  delay(1000);
+  esp_chip_info(&chip_info);
+
+  Serial.printf("\nESP32 Chip Information:\n");
+  Serial.printf("-----------------------\n");
+  Serial.printf("Chip model: %s\n", enumToString(chip_info.model));
+  Serial.printf("Number of cores: %d\n", chip_info.cores);
+  Serial.printf("Revision: %d\n", chip_info.revision);
+  Serial.printf("Embedded flash: %dMB\n", spi_flash_get_chip_size() / (1024 * 1024));
+  Serial.printf("Total heap size: %dKB\n", ESP.getHeapSize() / 1024);
+  Serial.printf("Free heap size: %dKB\n", ESP.getFreeHeap() / 1024);
+  Serial.printf("Largest free block: %dKB\n", ESP.getMaxAllocHeap() / 1024);
+  if (psramFound())
+  {
+    Serial.printf("Total PSRAM size: %d\n", ESP.getPsramSize());
+    Serial.printf("Free PSRAM size: %d\n", ESP.getFreePsram());
+  }
+  else
+  {
+    Serial.printf("PSRAM is not available\n");
+  }
+  reportChipFeatures(chip_info.features);
+  Serial.printf("Cache Log Bug: %s\n\n", soc_has_cache_lock_bug() ? "Yes" : "No");
+}
+
 void FindI2CDevices() 
 {
   byte error, address;

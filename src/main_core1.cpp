@@ -39,7 +39,7 @@ void IRAM_ATTR taskOnCore1(void *parameter)
 // Setup Function for Core1 - Add Setup code for Core1 here
 void setupCore1()
 {
-  SetupHeartbeatLED();
+  Heartbeat::Instance().StartHeartbeatLED();
 }
 
 // Loop Function for Core1 - Add Execution code for Core1 here

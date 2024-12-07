@@ -35,7 +35,7 @@ void UpdateDisplay(int servoDegree[NUM_SERVOS])
 
   for (int n = 0; n < NUM_SERVOS; n++)
   {  
-    // Print on first row of LCD
+    // Print on LCD
     lcd.setCursor(0, n);
     lcd.printf("Servo %d: %d", n, servoDegree[n]);
 

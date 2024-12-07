@@ -14,11 +14,12 @@ void setup()
   // Start Serial Monitor                                                 
   Serial.begin(115200);  
 
+  ReportChipInfo();
   SetupDisplay();
   SetupServos();
   SetupPotentiometers();
 
-  StartCore1();  // The Heartbeat LED runs on Core1 so that hang ups on Core0 don't effect it
+  StartCore1();  // The Heartbeat LED runs on Core1 so that hangs/crashes on Core0 don't effect it
 }
  
 void loop() 

@@ -1,6 +1,5 @@
 // Include Arduino Framework Library
 #include <Arduino.h>
-#include <math.h>
 
 #include "servos.h"
 
@@ -12,7 +11,7 @@ int potValueArray[NUM_SERVOS] = {};
 //  adcResolution should be set to the maximum resolution (in bits) of the ESP's ADC.
 //  Since there is no built-in function to get the resolution, we set and track it manually.
 const int adcResolution = 12;  
-int maxPotValue = pow(2, adcResolution) - 1;
+const int maxPotValue = (1 << adcResolution) - 1;  // equal to (2^adcResolution)-1
 
 void SetupPotentiometers()
 {
