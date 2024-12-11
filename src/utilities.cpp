@@ -73,7 +73,9 @@ void ReportChipInfo()
     Serial.printf("PSRAM is not available\n");
   }
   reportChipFeatures(chip_info.features);
+  #if CONFIG_ESP32_ECO3_CACHE_LOCK_FIX
   Serial.printf("Cache Log Bug: %s\n\n", soc_has_cache_lock_bug() ? "Yes" : "No");
+  #endif
 }
 
 void FindI2CDevices() 
