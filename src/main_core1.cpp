@@ -22,7 +22,7 @@ void StartCore1()
     NULL,              // Task parameters
     1,                 // Task priority
     &TaskCore1,        // Task handle
-    1                  // Core 1 (use Core 1 for this task)
+    0                  // Core 0 (use Core 0 for this task, Main App is on Core 1)
   );
 }
 
